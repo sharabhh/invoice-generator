@@ -11,7 +11,26 @@ router.get("/all-records", async (req, res) => {
     const records = await prisma.invoice.findMany();
     res.status(200).json({ data: records });
   } catch (e) {
-    res.status(500).json({ msg: "error fetching records" });
+    res.status(500).json({ msg: "error fetching records", e });
+  }
+});
+
+router.get("/specific-invoice/:invoiceId", async (req, res) => {
+  try {
+    const invoiceId = req.params.invoiceId;
+    const record = await prisma.invoice.findFirst({
+      where: {
+        invoiceNumber: invoiceId,
+      },
+    });
+
+    if (!record) {
+      return res.status(404).json({ message: "Invoice not found" });
+    }
+
+    res.status(200).json({ data: record });
+  } catch (e) {
+    res.status(500).json({ msg: "error fetching records", e });
   }
 });
 
