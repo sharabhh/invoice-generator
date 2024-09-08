@@ -6,7 +6,7 @@ const router = express.Router()
 const prisma = new PrismaClient()
 
 router.get('/', (req,res)=>{
-    res.send("hello")
+    res.send("hello from invoice")
 })
 
 console.log(invoiceNumberGenerator())
