@@ -1,16 +1,24 @@
 import express from "express";
 import invoiceRouter from "./routes/invoices";
 import { config } from "dotenv";
+import {Client} from 'pg'
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient()
 
 const app = express();
-config();
+app.use(express.json())
 app.use("/invoice", invoiceRouter);
+
+config();
 
 const PORT = process.env.PORT;
 
 app.get("/", (req, res) => {
-  res.send("hihihih");
+  res.send("index.ts file says hi");
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
