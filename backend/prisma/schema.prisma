@@ -17,7 +17,7 @@ model Invoice {
   id Int @id @default(autoincrement())
   clientName String
   date DateTime
-  invoiceNumber String
+  invoiceNumber String @unique
   currency String
   list ListItem[]     // one to many relation
   subTotal Float @default(0.0)
@@ -30,10 +30,10 @@ model ListItem{
   name String
   price Float
   quantity Int
-  invoice Invoice @relation(fields: [id], references: [id])
   invoiceId Int     //foreign key
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
   taxes Tax[]     //one to many relation
-  totalTax Float? @default(0.0)
+  totalTax Float @default(0.0)
   subTotal Float @default(0.0)
   total Float @default(0.0)
 }
@@ -42,6 +42,6 @@ model Tax{
 id Int @id @default(autoincrement())
 title String?
 rate Float?
-listItem ListItem @relation(fields: [listItemId], references: [id])
 listItemId Int
+listItem ListItem @relation(fields: [listItemId], references: [id])
 }
