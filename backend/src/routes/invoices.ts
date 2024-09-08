@@ -5,17 +5,17 @@ import invoiceNumberGenerator from "../utils/invoiceNumberGenerator";
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// fetch all records
 router.get("/all-records", async (req, res) => {
   try {
     const records = await prisma.invoice.findMany();
-    res.status(200).json({"data": records});
+    res.status(200).json({ data: records });
   } catch (e) {
     res.status(500).json({ msg: "error fetching records" });
   }
 });
 
 // create new invoice
-
 router.post("/new", async (req, res) => {
   const { date, currency, items, clientName } = req.body;
   const generatedInvoiceNumber = invoiceNumberGenerator();
@@ -88,6 +88,63 @@ router.post("/new", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ msg: "Something went wrong" });
+  }
+});
+
+// delete specific records via query params
+router.delete(`/delete-invoice/:invoiceId`, async (req, res) => {
+  const invoiceId = req.params.invoiceId;
+  console.log(invoiceId);
+
+  try {
+    const result = await prisma.$transaction(async (prisma) => {
+      const invoiceTableId = await prisma.invoice.findFirst({
+        where: {
+          invoiceNumber: invoiceId,
+        },
+      });
+
+      // console.log(invoiceTableId);
+
+      if (!invoiceTableId) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      const listItems = await prisma.listItem.findMany({
+        where: {
+          invoiceId: invoiceTableId?.id,
+        },
+      });
+
+      // finding all list ids
+      const listItemIds = listItems.map((item) => item.id);
+      console.log(listItemIds);
+
+      await prisma.tax.deleteMany({
+        where: {
+          listItemId: { in: listItemIds },
+        },
+      });
+
+      // delete the list items with invoiceId
+      await prisma.listItem.deleteMany({
+        where: {
+          invoiceId: invoiceTableId?.id,
+        },
+      });
+
+      // delete the invoice
+      await prisma.invoice.delete({
+        where: {
+          invoiceNumber: invoiceId,
+        },
+      });
+    });
+
+    res.status(200).json({ message: "deleted" });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ msg: "Error while deletion", e });
   }
 });
 
