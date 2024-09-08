@@ -15,6 +15,7 @@ router.get("/all-records", async (req, res) => {
   }
 });
 
+// fetch specific records
 router.get("/specific-invoice/:invoiceId", async (req, res) => {
   try {
     const invoiceId = req.params.invoiceId;
@@ -107,6 +108,91 @@ router.post("/new", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ msg: "Something went wrong" });
+  }
+});
+
+
+// update specific records
+router.put("/update-invoice/:invoiceId", async (req, res) => {
+  try {
+    const invoiceId = req.params.invoiceId;
+    console.log(invoiceId);
+
+    const { listContent, taxContent } = req.body;
+    console.log(listContent, taxContent);
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const instanceTableId = await prisma.invoice.findFirst({
+        where: {
+          invoiceNumber: invoiceId,
+        },
+      });
+
+      console.log("instance id: ", instanceTableId);
+
+      if (!instanceTableId) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      for (const item of listContent) {
+        const listItem = await prisma.listItem.findFirst({
+          where: {
+            id: item.id,
+            invoiceId: instanceTableId.id,
+          },
+        });
+
+        if (!listItem) {
+          return res.status(404).json({ message: `List item with ID ${item.id} not found` });
+        }
+
+        await prisma.listItem.update({
+          where: {
+            id: item.id,
+          },
+          data: {
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            subTotal: item.subTotal,
+            totalTax: item.totalTax,
+            total: item.total,
+          },
+        });
+      }
+
+      console.log("List items updated successfully.");
+
+      // Verify and update taxes
+      for (const tax of taxContent) {
+        const taxItem = await prisma.tax.findFirst({
+          where: {
+            id: tax.id,
+            listItemId: tax.listItemId, // Ensure this is passed correctly in `taxContent`
+          },
+        });
+
+        if (!taxItem) {
+          return res.status(404).json({ message: `Tax with ID ${tax.id} not found` });
+        }
+
+        await prisma.tax.update({
+          where: {
+            id: tax.id,
+          },
+          data: {
+            title: tax.title,
+            rate: tax.rate,
+          },
+        });
+      }
+
+      console.log('taxes updated succesfully');
+      
+      return { message: "Update successful" };
+    });
+  } catch (e) {
+    console.log(e);
   }
 });
 
