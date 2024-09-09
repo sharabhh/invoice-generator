@@ -1,9 +1,26 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import invoiceNumberGenerator from "../utils/invoiceNumberGenerator";
+import { z } from "zod";
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+const dateSchema = z.string().date();
+const currencySchema = z.enum(["INR", "USD", "EUR"]);
+const clientNameSchema = z.string();
+const itemsSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+  quantity: z.number(),
+  taxes: z.array(
+    z.object({
+      title: z.string().optional(),
+      rate: z.number().optional(),
+    })
+  ).optional(),
+});
+const arrayOfItemsSchema = z.array(itemsSchema)
 
 // fetch all records
 router.get("/all-records", async (req, res) => {
@@ -39,6 +56,26 @@ router.get("/specific-invoice/:invoiceId", async (req, res) => {
 router.post("/new", async (req, res) => {
   const { date, currency, items, clientName } = req.body;
   const generatedInvoiceNumber = invoiceNumberGenerator();
+  
+  const dateValidate = dateSchema.safeParse(date);
+  const currencyValidate = currencySchema.safeParse(currency);
+  const clientNameValidate = clientNameSchema.safeParse(clientName);
+  const itemsSchemaValidate = arrayOfItemsSchema.safeParse(items);
+
+  console.log(
+    dateValidate,
+    currencyValidate,
+    clientNameValidate,
+    itemsSchemaValidate
+  );
+
+  if (
+    !dateValidate.success ||
+    !currencyValidate.success ||
+    !clientNameValidate.success
+  ) {
+    return res.status(400).json({ msg: "incorrect data format" });
+  }
 
   try {
     const newInvoice = await prisma.invoice.create({
@@ -104,13 +141,12 @@ router.post("/new", async (req, res) => {
       },
     });
 
-    res.json(updatedInvoice);
+    res.status(201).json(updatedInvoice);
   } catch (e) {
     console.error(e);
     res.status(500).json({ msg: "Something went wrong" });
   }
 });
-
 
 // update specific records
 router.put("/update-invoice/:invoiceId", async (req, res) => {
@@ -143,7 +179,9 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
         });
 
         if (!listItem) {
-          return res.status(404).json({ message: `List item with ID ${item.id} not found` });
+          return res
+            .status(404)
+            .json({ message: `List item with ID ${item.id} not found` });
         }
 
         await prisma.listItem.update({
@@ -173,7 +211,9 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
         });
 
         if (!taxItem) {
-          return res.status(404).json({ message: `Tax with ID ${tax.id} not found` });
+          return res
+            .status(404)
+            .json({ message: `Tax with ID ${tax.id} not found` });
         }
 
         await prisma.tax.update({
@@ -187,8 +227,8 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
         });
       }
 
-      console.log('taxes updated succesfully');
-      
+      console.log("taxes updated succesfully");
+
       return { message: "Update successful" };
     });
   } catch (e) {
