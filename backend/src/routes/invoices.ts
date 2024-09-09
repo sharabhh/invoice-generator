@@ -1,26 +1,11 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import invoiceNumberGenerator from "../utils/invoiceNumberGenerator";
-import { z } from "zod";
+import {dateSchema, currencySchema, clientNameSchema, arrayOfItemsSchema, arrayOfItemPutSchema, arrayOfTaxPutSchema} from '../utils/dataValidation'
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-const dateSchema = z.string().date();
-const currencySchema = z.enum(["INR", "USD", "EUR"]);
-const clientNameSchema = z.string();
-const itemsSchema = z.object({
-  name: z.string(),
-  price: z.number(),
-  quantity: z.number(),
-  taxes: z.array(
-    z.object({
-      title: z.string().optional(),
-      rate: z.number().optional(),
-    })
-  ).optional(),
-});
-const arrayOfItemsSchema = z.array(itemsSchema)
 
 // fetch all records
 router.get("/all-records", async (req, res) => {
@@ -152,10 +137,18 @@ router.post("/new", async (req, res) => {
 router.put("/update-invoice/:invoiceId", async (req, res) => {
   try {
     const invoiceId = req.params.invoiceId;
-    console.log(invoiceId);
 
     const { listContent, taxContent } = req.body;
-    console.log(listContent, taxContent);
+
+    const validateListContent = arrayOfItemPutSchema.safeParse(listContent)
+    
+    const validateTaxContent = arrayOfTaxPutSchema.safeParse(taxContent)
+    console.log(validateListContent, validateTaxContent);
+
+    if(!validateListContent.success || !validateTaxContent.success){
+      return res.status(400).json({msg: "data send was wrong"})
+    }
+    
 
     const result = await prisma.$transaction(async (prisma) => {
       const instanceTableId = await prisma.invoice.findFirst({
@@ -163,8 +156,6 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
           invoiceNumber: invoiceId,
         },
       });
-
-      console.log("instance id: ", instanceTableId);
 
       if (!instanceTableId) {
         return res.status(404).json({ message: "Invoice not found" });
@@ -229,10 +220,11 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
 
       console.log("taxes updated succesfully");
 
-      return { message: "Update successful" };
+      res.status(200).json({msg: "succesfully updated."})
     });
   } catch (e) {
     console.log(e);
+    res.status(500).json({msg: "some error occured while updating"})
   }
 });
 
