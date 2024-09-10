@@ -62,10 +62,15 @@ router.post("/new", async (req, res) => {
     return res.status(400).json({ msg: "incorrect data format" });
   }
 
+  // formatting date in YYYY-MM-DD format
+  const parsedDate = new Date(date);
+  const dateString = parsedDate.toISOString().split('T')[0]
+  console.log(dateString);
+  
   try {
     const newInvoice = await prisma.invoice.create({
       data: {
-        date: new Date(date),
+        date: dateString,
         invoiceNumber: generatedInvoiceNumber,
         currency,
         clientName,

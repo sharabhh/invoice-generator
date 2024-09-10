@@ -16,7 +16,7 @@ datasource db {
 model Invoice {
   id Int @id @default(autoincrement())
   clientName String
-  date DateTime
+  date String
   invoiceNumber String @unique
   currency String
   list ListItem[]     // one to many relation

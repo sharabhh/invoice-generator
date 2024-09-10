@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-const dateSchema = z.string().date();
+const dateSchema = z.coerce.date();
 const currencySchema = z.enum(["INR", "USD", "EUR"]);
 const clientNameSchema = z.string();
 const itemsSchema = z.object({
