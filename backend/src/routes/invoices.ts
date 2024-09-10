@@ -21,17 +21,35 @@ router.get("/all-records", async (req, res) => {
 router.get("/specific-invoice/:invoiceId", async (req, res) => {
   try {
     const invoiceId = req.params.invoiceId;
-    const record = await prisma.invoice.findFirst({
+    const invoiceRecord = await prisma.invoice.findFirst({
       where: {
         invoiceNumber: invoiceId,
       },
     });
 
-    if (!record) {
+    const itemsRecord = await prisma.listItem.findMany({
+      where: {
+        invoiceId: invoiceRecord?.id
+      }
+    })
+
+    const taxRecords = await Promise.all(
+      itemsRecord.map(async (item) => {
+        const taxes = await prisma.tax.findMany({
+          where: {
+            listItemId: item.id,
+          },
+        });
+        return { itemId: item.id, taxes };
+      })
+    );
+
+
+    if (!invoiceRecord || !itemsRecord || !taxRecords) {
       return res.status(404).json({ message: "Invoice not found" });
     }
 
-    res.status(200).json({ data: record });
+    res.status(200).json({ data: invoiceRecord, itemsRecord, taxRecords });
   } catch (e) {
     res.status(500).json({ msg: "error fetching records", e });
   }
