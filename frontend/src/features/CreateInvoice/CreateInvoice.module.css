@@ -1,0 +1,66 @@
+.body {
+  width: 80%;
+  margin: 3rem auto;
+}
+.top-part {
+  display: flex;
+  margin-bottom: 2rem;
+  gap: 20px;
+}
+.input {
+  width: 150px;
+  padding: 8px 12px;
+  background-color: #646464;
+  color: white;
+  outline: none;
+  border: none;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+.input::placeholder {
+  color: white;
+  opacity: 0.5;
+}
+.item-list {
+  margin: 10px 0;
+}
+.item-list-inputs {
+  padding: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+.hr {
+  margin: 4px 0;
+  height: 0.5px;
+  opacity: 0.5;
+  width: 500px;
+}
+.add-another-item {
+  color: #1880cc;
+  font-size: 14px;
+  font-weight: 700;
+}
+.addTaxButton {
+  padding: 8px 10px;
+  height: 40px;
+  background-color: #1880cc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+.submitBtn{
+    margin-top: 1rem;
+    display: block;
+    width: 100px;
+    margin: 0 auto;
+}
+
+.error{
+    margin-top: 4px;
+    font-size: 12px;
+    color: red;
+    display: flex;
+    justify-content: center;
+}
