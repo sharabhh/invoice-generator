@@ -4,9 +4,20 @@ import { IoFilterOutline } from "react-icons/io5";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import baseUrl from "../../config";
+import DashMiniMenu from "../../Components/DashMiniMenu/DashMiniMenu";
 
 function Dashboard() {
   const [allRecords, setAllRecords] = useState([]);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+    null
+  );
+  const [currentActiveId, setCurrentActiveId]: any = useState(null);
+
+  const handleShowOptions = (id: string) => {
+    setSelectedInvoiceId(id === selectedInvoiceId ? null : id);
+    setCurrentActiveId(id);
+  };
+
   useEffect(() => {
     async function fetchAllRecords() {
       const response = await axios.get(`${baseUrl}/invoice/all-records`);
@@ -14,7 +25,8 @@ function Dashboard() {
     }
     fetchAllRecords();
   }, []);
-  console.log(allRecords);
+
+  // console.log(currentActiveId);
 
   return (
     <>
@@ -24,7 +36,11 @@ function Dashboard() {
           <div className={`${styles["dashboard-heading"]}`}>
             <h3>Invoices</h3>
             <div>
-              <input className={`${styles["search-box"]}`} type="text" />
+              <input
+                className={`${styles["search-box"]}`}
+                type="text"
+                placeholder="search"
+              />
               <span className={`${styles["empty-span"]}`}>
                 <IoFilterOutline />
               </span>
@@ -57,7 +73,23 @@ function Dashboard() {
                     <p className={`${styles["small-p"]}`}>{item?.clientName}</p>
                     <p className={`${styles["small-p"]}`}>{item?.date}</p>
                     <p className={`${styles["small-p"]}`}>{item?.currency}</p>
-                    <p className={`${styles["small-p"]}`}>{item?.total}</p>
+                    <div className={`${styles["amount-button-container"]}`}>
+                      <p className={`${styles["small-p"]}`}>
+                        {item?.currency === "INR"
+                          ? "₹ "
+                          : item?.currency === "USD"
+                          ? "$ "
+                          : "£ "}
+                        {item?.total}
+                      </p>
+                      <div
+                        className={`${styles.dot}`}
+                        onClick={() => handleShowOptions(item.id)}
+                      >
+                        <p>...</p>
+                      </div>
+                      {selectedInvoiceId === item.id && <DashMiniMenu />}
+                    </div>
                   </div>
                 ))
               : ""}

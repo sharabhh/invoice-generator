@@ -14,12 +14,17 @@
 }
 
 .search-box{
-    font-size: 1.2rem;
-    padding: 4px 10px;
+    font-size: 1.1rem;
+    padding: 6px 14px;
     color: white;
     background-color: #646464;
     border: none;
     border-radius: 8px;
+    outline: none;
+}
+.search-box::placeholder{
+    color: white;
+    opacity: 0.4;
 }
 .empty-span{
     padding: 4px;
@@ -38,14 +43,14 @@
 .dashboard-table-heading{
     background-color: #535353;
     display: grid;
-    padding: 8px 10px;
+    padding: 10px 14px;
     grid-template-columns: repeat(5,1fr);
     width: 100%;
     box-sizing: border-box;
     border-radius: 10px 10px 0 0;
 }
 .dashboard-table-heading-p{
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 400;
     color: #ffffff;
 }
@@ -62,4 +67,24 @@
 .small-p{
     font-size: 0.8rem;
     
+}
+.amount-button-container{
+    display: flex;
+    justify-content: space-between;
+    padding-right: 2rem;
+}
+.dot{
+    padding: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: #4d4c4c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.active-dropdown{
+    /* margin-bottom: 1rem; */
 }
