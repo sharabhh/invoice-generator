@@ -1,0 +1,33 @@
+.body-container{
+    width: 80%;
+    margin: 1rem auto;
+
+}
+.top-part{
+    display: flex;
+    justify-content: space-between;
+}
+.main-body{
+    margin-top: 1rem;
+    background-color: #545353;
+    padding: 16px 20px;
+    border-radius: 12px;
+}
+.main-body-name{
+    display: flex;
+    justify-content: space-between;
+}
+.table{
+    margin-top: 1rem;
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #8d8c8c;
+}
+.th{
+    border-right: 1px solid #8d8c8c;
+  border-bottom: 1px solid #8d8c8c;
+  padding: 12px 8px;
+  text-align: left;
+  font-size: 14px;
+  color: white; 
+}

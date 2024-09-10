@@ -1,6 +1,7 @@
 import './App.css'
 import {BrowserRouter, Routes, Route} from "react-router-dom"
 import Dashboard from './features/Dashboard/Dashboard'
+import ViewInvoice from './features/ViewInvoice/ViewInvoice'
 
 function App() {
 
@@ -9,7 +10,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Dashboard />} />
-          <Route path='/a' element={<h1>bye</h1>} />
+          <Route path='/new-invoice' element={<h1>bye</h1>} />
+          <Route path='/invoice/:id' element={<ViewInvoice />} />
           <Route path='*' element={<h1>Not found</h1>} />
         </Routes>
       </BrowserRouter>

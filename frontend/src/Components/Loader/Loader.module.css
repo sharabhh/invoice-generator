@@ -1,0 +1,45 @@
+.container {
+    width: 100vw;
+    margin-top: 5rem;
+    display: grid;
+    grid-template-columns: repeat(5, 50px);
+    justify-content: center;
+    align-items: center;
+}
+
+.ball {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    animation: wave 1.5s ease-in-out infinite;
+  background-color:#1A9FFF;
+}
+
+.ball:nth-child(2) {
+    animation-delay: -0.2s;
+    background-color:#1880CC;
+}
+
+.ball:nth-child(3) {
+    animation-delay: -0.4s;
+  background-color:#064775;
+}
+
+.ball:nth-child(4) {
+    animation-delay: -0.6s;
+  background-color:#4d4c4c;
+}
+
+.ball:nth-child(5) {
+    animation-delay: -0.8s;
+    background-color:#646464;
+}
+
+@keyframes wave {
+    0%, 100% {
+        transform: translateY(30px);
+    }
+    50% {
+        transform: translateY(-30px);
+    }
+}

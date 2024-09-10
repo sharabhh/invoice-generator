@@ -5,28 +5,39 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import baseUrl from "../../config";
 import DashMiniMenu from "../../Components/DashMiniMenu/DashMiniMenu";
+import currencyIcon from "../../utils/currencyIcon";
+import { useNavigate } from "react-router-dom";
+import Loader from "../../Components/Loader/Loader";
 
 function Dashboard() {
   const [allRecords, setAllRecords] = useState([]);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
     null
   );
+  const navigate = useNavigate();
   const [currentActiveId, setCurrentActiveId]: any = useState(null);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleShowOptions = (id: string) => {
+  function handleShowOptions(id: string) {
     setSelectedInvoiceId(id === selectedInvoiceId ? null : id);
     setCurrentActiveId(id);
-  };
+  }
+
+  function handleInvoiceId(invoice: string) {
+    setInvoiceNumber(invoice);
+    navigate(`/invoice/${invoice}`);
+  }
 
   useEffect(() => {
     async function fetchAllRecords() {
       const response = await axios.get(`${baseUrl}/invoice/all-records`);
       setAllRecords(response?.data?.data);
+      setLoading(false)
     }
     fetchAllRecords();
   }, []);
 
-  // console.log(currentActiveId);
 
   return (
     <>
@@ -61,11 +72,12 @@ function Dashboard() {
               </p>
               <p className={`${styles["dashboard-table-heading-p"]}`}>Amount</p>
             </div>
-            {allRecords?.length >= 1
+            {allRecords?.length >= 1 && !loading
               ? allRecords.map((item: any) => (
                   <div
                     key={item.id}
                     className={`${styles["dashboard-table-tabs"]}`}
+                    onClick={() => handleInvoiceId(item?.invoiceNumber)}
                   >
                     <p className={`${styles["small-p"]}`}>
                       #{item?.invoiceNumber}
@@ -75,11 +87,7 @@ function Dashboard() {
                     <p className={`${styles["small-p"]}`}>{item?.currency}</p>
                     <div className={`${styles["amount-button-container"]}`}>
                       <p className={`${styles["small-p"]}`}>
-                        {item?.currency === "INR"
-                          ? "₹ "
-                          : item?.currency === "USD"
-                          ? "$ "
-                          : "£ "}
+                        {currencyIcon(item?.currency)}
                         {item?.total}
                       </p>
                       <div
@@ -92,7 +100,7 @@ function Dashboard() {
                     </div>
                   </div>
                 ))
-              : ""}
+              : (<Loader />)}
           </div>
         </div>
       </div>

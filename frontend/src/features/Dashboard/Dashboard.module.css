@@ -63,6 +63,7 @@
     grid-template-columns: repeat(5,1fr);
     width: 100%;
     box-sizing: border-box;
+    cursor: pointer;
 }
 .small-p{
     font-size: 0.8rem;
