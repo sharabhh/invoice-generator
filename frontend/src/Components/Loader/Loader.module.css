@@ -1,5 +1,4 @@
 .container {
-    width: 100vw;
     margin-top: 5rem;
     display: grid;
     grid-template-columns: repeat(5, 50px);
