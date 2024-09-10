@@ -1,6 +1,7 @@
 .container{
     position: absolute;
-    margin-left: 6.2rem;
+    margin-left: 6rem;
+    margin-top: 5rem;
     padding: 12px 20px;
     background-color: #4d4c4c;
     width: fit-content;

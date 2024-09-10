@@ -19,10 +19,14 @@ function Dashboard() {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [loading, setLoading] = useState(true);
 
-  function handleShowOptions(id: string) {
+  function handleShowOptions(id: string, e: React.MouseEvent<HTMLDivElement>) {
+    e.stopPropagation();
     setSelectedInvoiceId(id === selectedInvoiceId ? null : id);
     setCurrentActiveId(id);
   }
+
+console.log(currentActiveId);
+
 
   function handleInvoiceId(invoice: string) {
     setInvoiceNumber(invoice);
@@ -92,11 +96,11 @@ function Dashboard() {
                       </p>
                       <div
                         className={`${styles.dot}`}
-                        onClick={() => handleShowOptions(item.id)}
+                        onClick={(e) => handleShowOptions(item?.id, e)}
                       >
                         <p>...</p>
                       </div>
-                      {selectedInvoiceId === item.id && <DashMiniMenu />}
+                      {selectedInvoiceId === item?.id && <DashMiniMenu />}
                     </div>
                   </div>
                 ))
