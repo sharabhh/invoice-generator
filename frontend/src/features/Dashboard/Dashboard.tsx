@@ -42,6 +42,9 @@ console.log(currentActiveId);
     fetchAllRecords();
   }, []);
 
+  function handleRedirectNewInvoice(){
+    navigate('/new-invoice')
+  }
 
   return (
     <>
@@ -106,6 +109,9 @@ console.log(currentActiveId);
                 ))
               : (<Loader />)}
           </div>
+        </div>
+        <div className={`${styles.add}`} onClick={handleRedirectNewInvoice}>
+          +
         </div>
       </div>
     </>
