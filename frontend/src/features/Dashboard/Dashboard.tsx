@@ -19,33 +19,38 @@ function Dashboard() {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [loading, setLoading] = useState(true);
 
-  function handleShowOptions(id: string,invoiceId: string, e: React.MouseEvent<HTMLDivElement>) {
+  function handleShowOptions(
+    id: string,
+    invoiceId: string,
+    e: React.MouseEvent<HTMLDivElement>
+  ) {
     e.stopPropagation();
     setSelectedInvoiceId(id === selectedInvoiceId ? null : id);
     setCurrentActiveId(id);
-    setInvoiceNumber(invoiceId)
+    setInvoiceNumber(invoiceId);
     console.log(invoiceId);
-    
   }
 
-// console.log(currentActiveId);
+  // console.log(currentActiveId);
 
   function handleInvoiceId(invoice: string) {
     setInvoiceNumber(invoice);
-    navigate(`/invoice/${invoice}`);
+  }
+  function handleViewInvoiceRedirect(invoiceRedirectId: string) {
+    navigate(`/invoice/${invoiceRedirectId}`);
   }
 
   useEffect(() => {
     async function fetchAllRecords() {
       const response = await axios.get(`${baseUrl}/invoice/all-records`);
       setAllRecords(response?.data?.data);
-      setLoading(false)
+      setLoading(false);
     }
     fetchAllRecords();
   }, []);
 
-  function handleRedirectNewInvoice(){
-    navigate('/new-invoice')
+  function handleRedirectNewInvoice() {
+    navigate("/new-invoice");
   }
 
   return (
@@ -81,35 +86,48 @@ function Dashboard() {
               </p>
               <p className={`${styles["dashboard-table-heading-p"]}`}>Amount</p>
             </div>
-            {allRecords?.length >= 1 && !loading
-              ? allRecords.map((item: any) => (
+            {allRecords?.length >= 1 && !loading ? (
+              allRecords.map((item: any) => (
+                <div
+                  key={item.id}
+                  className={`${styles["dashboard-table-tabs"]}`}
+                  onClick={() => handleInvoiceId(item?.invoiceNumber)}
+                >
                   <div
-                    key={item.id}
-                    className={`${styles["dashboard-table-tabs"]}`}
-                    onClick={() => handleInvoiceId(item?.invoiceNumber)}
+                    className=""
+                    onClick={() =>
+                      handleViewInvoiceRedirect(item?.invoiceNumber)
+                    }
                   >
                     <p className={`${styles["small-p"]}`}>
                       #{item?.invoiceNumber}
                     </p>
-                    <p className={`${styles["small-p"]}`}>{item?.clientName}</p>
-                    <p className={`${styles["small-p"]}`}>{item?.date}</p>
-                    <p className={`${styles["small-p"]}`}>{item?.currency}</p>
-                    <div className={`${styles["amount-button-container"]}`}>
-                      <p className={`${styles["small-p"]}`}>
-                        {currencyIcon(item?.currency)}
-                        {item?.total}
-                      </p>
-                      <div
-                        className={`${styles.dot}`}
-                        onClick={(e) => handleShowOptions(item?.id, item?.invoiceNumber, e)}
-                      >
-                        <p>...</p>
-                      </div>
-                      {selectedInvoiceId === item?.id && <DashMiniMenu invoiceId={invoiceNumber} />}
-                    </div>
                   </div>
-                ))
-              : (<Loader />)}
+                  <p className={`${styles["small-p"]}`}>{item?.clientName}</p>
+                  <p className={`${styles["small-p"]}`}>{item?.date}</p>
+                  <p className={`${styles["small-p"]}`}>{item?.currency}</p>
+                  <div className={`${styles["amount-button-container"]}`}>
+                    <p className={`${styles["small-p"]}`}>
+                      {currencyIcon(item?.currency)}
+                      {item?.total}
+                    </p>
+                    <div
+                      className={`${styles.dot}`}
+                      onClick={(e) =>
+                        handleShowOptions(item?.id, item?.invoiceNumber, e)
+                      }
+                    >
+                      <p>...</p>
+                    </div>
+                    {selectedInvoiceId === item?.id && (
+                      <DashMiniMenu invoiceId={invoiceNumber} />
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <Loader />
+            )}
           </div>
         </div>
         <div className={`${styles.add}`} onClick={handleRedirectNewInvoice}>

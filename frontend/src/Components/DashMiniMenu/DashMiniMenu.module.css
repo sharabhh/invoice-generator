@@ -1,6 +1,7 @@
 .container{
     position: absolute;
-    margin-left: 6rem;
+    /* margin-left: 16rem; */
+    right: 8rem;
     margin-top: 5rem;
     padding: 12px 20px;
     background-color: #4d4c4c;
@@ -19,4 +20,57 @@
 }
 li{
     text-decoration: none;
+}
+
+.toast{
+    padding: 12px 16px;
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4d4c4c;
+    transition: 1s;
+    /* opacity: 0.5; */
+    animation: fader 3s ease-in-out;
+    color: white;
+    border: none;
+    border-radius: 25px;
+}
+
+@keyframes fader {
+    0%{
+        opacity: 0
+    }
+    50%{
+        opacity: 0.7;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+@media only screen and (max-width: 1650px){
+    .container{
+        right: 7.5rem;
+    }
+}
+@media only screen and (max-width: 1400px){
+    .container{
+        right: 6rem;
+    }
+}
+@media only screen and (max-width: 1100px){
+    .container{
+        right: 4rem;
+    }
+}
+@media only screen and (max-width: 950px){
+    .container{
+        right: 3rem;
+    }
+}
+@media only screen and (max-width: 700px){
+    .container{
+        right: 1rem;
+    }
 }
