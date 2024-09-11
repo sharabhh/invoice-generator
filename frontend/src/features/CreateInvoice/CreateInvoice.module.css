@@ -4,8 +4,21 @@
 }
 .top-part {
   display: flex;
+  flex-wrap: wrap;
   margin-bottom: 2rem;
   gap: 20px;
+}
+.label {
+  font-size: 12px;
+  position: relative;
+  left: 4px;
+  display: inline;
+  opacity: 0.9;
+}
+.label-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 .input {
   width: 150px;
@@ -16,6 +29,11 @@
   border: none;
   font-size: 1rem;
   border-radius: 4px;
+}
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .input::placeholder {
   color: white;
@@ -42,6 +60,12 @@
   font-size: 14px;
   font-weight: 700;
 }
+.addItemButton{
+  color: #1880cc;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 .addTaxButton {
   padding: 8px 10px;
   height: 40px;
@@ -50,17 +74,61 @@
   border: none;
   border-radius: 8px;
 }
-.submitBtn{
-    margin-top: 1rem;
-    display: block;
-    width: 100px;
-    margin: 0 auto;
+.calculation {
+  margin-top: 1rem;
+}
+.ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  line-height: 22px;
+}
+.li {
+  display: flex;
+  flex-wrap: wrap;
+  word-break: break-all;
+  margin-bottom: 15px;
+}
+.taxes-list-align {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  /* flex-direction: column; */
+}
+.taxes-list-align span {
+  margin-right: 10px;
+}
+.submitBtn {
+  margin-top: 1rem;
+  display: block;
+  width: 100px;
+  margin: 0 auto;
 }
 
-.error{
-    margin-top: 4px;
-    font-size: 12px;
-    color: red;
-    display: flex;
-    justify-content: center;
+.error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: red;
+  display: flex;
+  justify-content: center;
+}
+
+.mainContainer{
+  width: 100%;
+}
+
+@media only screen and ( max-width: 750px ){
+  .hr{
+    height: 0.1px;
+    width: 300px;
+  }
+  .input{
+    width: 132px;
+  }
+}
+
+@media only screen and ( max-width: 400px ){
+  .input{
+    width: 100px;
+  }
 }
