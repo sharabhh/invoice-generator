@@ -1,6 +1,5 @@
 .container{
     position: absolute;
-    /* margin-left: 16rem; */
     right: 8rem;
     margin-top: 5rem;
     padding: 12px 20px;
@@ -30,7 +29,6 @@ li{
     transform: translateX(-50%);
     background-color: #4d4c4c;
     transition: 1s;
-    /* opacity: 0.5; */
     animation: fader 3s ease-in-out;
     color: white;
     border: none;

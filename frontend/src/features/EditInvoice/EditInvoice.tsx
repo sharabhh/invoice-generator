@@ -67,7 +67,6 @@ function EditInvoice() {
     fetchInvoice();
   }, [id]);
 
-  // console.log("item list : ", itemList);
 
   // Create a map of taxes by item ID for easier access
   const taxMap = new Map<number, Tax[]>();

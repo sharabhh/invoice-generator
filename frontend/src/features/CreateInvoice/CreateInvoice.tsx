@@ -109,19 +109,6 @@ function CreateInvoice() {
     }));
   }
 
-  // function addTax(itemIndex: number) {
-  //   const updatedItems = [...formData.items];
-  //   if (updatedItems[itemIndex].taxes.length < 3) {
-  //     updatedItems[itemIndex].taxes.push({ title: "", rate: 0 });
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       items: updatedItems,
-  //     }));
-  //   } else {
-  //     setErrorMsg("You can only add up to 3 taxes per item.");
-  //   }
-  // }
-
   async function handleSubmit() {
     setLoading(true);
     const preparedData: Invoice = {
@@ -340,15 +327,6 @@ function CreateInvoice() {
                     <label htmlFor="btn" className={styles.label}>
                       &nbsp;
                     </label>
-                    {/* <button
-                    type="button"
-                    onClick={() => addTax(index)}
-                    id="btn"
-                    className={styles.addTaxButton}
-                    disabled={item.taxes.length >= 3}
-                    >
-                    Add Tax
-                    </button> */}
                   </span>
                 </div>
               ))}

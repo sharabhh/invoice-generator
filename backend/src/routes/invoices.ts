@@ -216,28 +216,6 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
         });
       }
 
-      // Update taxes
-      // for (const tax of taxContent) {
-      //   const taxItem = await prisma.tax.findUnique({
-      //     where: { id: tax.id },
-      //     include: {
-      //       listItem: true,  // Ensure the related list item is included
-      //     },
-      //   });
-
-      //   if (!taxItem || taxItem.listItemId !== invoice.id) {
-      //     return res.status(404).json({ message: `Tax with ID ${tax.id} not found` });
-      //   }
-
-      //   await prisma.tax.update({
-      //     where: { id: tax.id },
-      //     data: {
-      //       title: tax.title,
-      //       rate: tax.rate,
-      //     },
-      //   });
-      // }
-
       // Recalculate totals
       const totalSubTotal = listContent.reduce((acc: any, item: any) => acc + item.subTotal, 0);
       const totalTaxes = listContent.reduce((acc: any, item: any) => acc + item.totalTax, 0);
