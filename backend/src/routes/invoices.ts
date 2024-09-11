@@ -1,11 +1,17 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import invoiceNumberGenerator from "../utils/invoiceNumberGenerator";
-import {dateSchema, currencySchema, clientNameSchema, arrayOfItemsSchema, arrayOfItemPutSchema, arrayOfTaxPutSchema} from '../utils/dataValidation'
+import {
+  dateSchema,
+  currencySchema,
+  clientNameSchema,
+  arrayOfItemsSchema,
+  arrayOfItemPutSchema,
+  arrayOfTaxPutSchema,
+} from "../utils/dataValidation";
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
 
 // fetch all records
 router.get("/all-records", async (req, res) => {
@@ -29,9 +35,9 @@ router.get("/specific-invoice/:invoiceId", async (req, res) => {
 
     const itemsRecord = await prisma.listItem.findMany({
       where: {
-        invoiceId: invoiceRecord?.id
-      }
-    })
+        invoiceId: invoiceRecord?.id,
+      },
+    });
 
     const taxRecords = await Promise.all(
       itemsRecord.map(async (item) => {
@@ -43,7 +49,6 @@ router.get("/specific-invoice/:invoiceId", async (req, res) => {
         return { itemId: item.id, taxes };
       })
     );
-
 
     if (!invoiceRecord || !itemsRecord || !taxRecords) {
       return res.status(404).json({ message: "Invoice not found" });
@@ -59,7 +64,7 @@ router.get("/specific-invoice/:invoiceId", async (req, res) => {
 router.post("/new", async (req, res) => {
   const { date, currency, items, clientName } = req.body;
   const generatedInvoiceNumber = invoiceNumberGenerator();
-  
+
   const dateValidate = dateSchema.safeParse(date);
   const currencyValidate = currencySchema.safeParse(currency);
   const clientNameValidate = clientNameSchema.safeParse(clientName);
@@ -82,9 +87,9 @@ router.post("/new", async (req, res) => {
 
   // formatting date in YYYY-MM-DD format
   const parsedDate = new Date(date);
-  const dateString = parsedDate.toISOString().split('T')[0]
+  const dateString = parsedDate.toISOString().split("T")[0];
   console.log(dateString);
-  
+
   try {
     const newInvoice = await prisma.invoice.create({
       data: {
@@ -159,49 +164,47 @@ router.post("/new", async (req, res) => {
 // update specific records
 router.put("/update-invoice/:invoiceId", async (req, res) => {
   try {
-    const invoiceId = req.params.invoiceId;
+    const invoiceNumber = req.params.invoiceId;
 
     const { listContent, taxContent } = req.body;
 
-    const validateListContent = arrayOfItemPutSchema.safeParse(listContent)
-    
-    const validateTaxContent = arrayOfTaxPutSchema.safeParse(taxContent)
-    console.log(validateListContent, validateTaxContent);
+    // Validate the input data
+    const validateListContent = arrayOfItemPutSchema.safeParse(listContent);
+    const validateTaxContent = arrayOfTaxPutSchema.safeParse(taxContent);
 
-    if(!validateListContent.success || !validateTaxContent.success){
-      return res.status(400).json({msg: "data send was wrong"})
+    if (!validateListContent.success || !validateTaxContent.success) {
+      return res.status(400).json({ msg: "Invalid data format" });
     }
-    
 
+    // Use a transaction to ensure atomicity
     const result = await prisma.$transaction(async (prisma) => {
-      const instanceTableId = await prisma.invoice.findFirst({
-        where: {
-          invoiceNumber: invoiceId,
+      // Find the invoice by invoiceNumber
+      const invoice = await prisma.invoice.findUnique({
+        where: { invoiceNumber: invoiceNumber },
+        include: {
+          list: true,  // Ensure related list items are included
         },
       });
 
-      if (!instanceTableId) {
+      if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
 
+      // Update each list item
       for (const item of listContent) {
-        const listItem = await prisma.listItem.findFirst({
-          where: {
-            id: item.id,
-            invoiceId: instanceTableId.id,
+        const listItem = await prisma.listItem.findUnique({
+          where: { id: item.id },
+          include: {
+            taxes: true,  // Ensure related taxes are included
           },
         });
 
-        if (!listItem) {
-          return res
-            .status(404)
-            .json({ message: `List item with ID ${item.id} not found` });
+        if (!listItem || listItem.invoiceId !== invoice.id) {
+          return res.status(404).json({ message: `List item with ID ${item.id} not found` });
         }
 
         await prisma.listItem.update({
-          where: {
-            id: item.id,
-          },
+          where: { id: item.id },
           data: {
             name: item.name,
             price: item.price,
@@ -213,43 +216,51 @@ router.put("/update-invoice/:invoiceId", async (req, res) => {
         });
       }
 
-      console.log("List items updated successfully.");
+      // Update taxes
+      // for (const tax of taxContent) {
+      //   const taxItem = await prisma.tax.findUnique({
+      //     where: { id: tax.id },
+      //     include: {
+      //       listItem: true,  // Ensure the related list item is included
+      //     },
+      //   });
 
-      // Verify and update taxes
-      for (const tax of taxContent) {
-        const taxItem = await prisma.tax.findFirst({
-          where: {
-            id: tax.id,
-            listItemId: tax.listItemId, // Ensure this is passed correctly in `taxContent`
-          },
-        });
+      //   if (!taxItem || taxItem.listItemId !== invoice.id) {
+      //     return res.status(404).json({ message: `Tax with ID ${tax.id} not found` });
+      //   }
 
-        if (!taxItem) {
-          return res
-            .status(404)
-            .json({ message: `Tax with ID ${tax.id} not found` });
-        }
+      //   await prisma.tax.update({
+      //     where: { id: tax.id },
+      //     data: {
+      //       title: tax.title,
+      //       rate: tax.rate,
+      //     },
+      //   });
+      // }
 
-        await prisma.tax.update({
-          where: {
-            id: tax.id,
-          },
-          data: {
-            title: tax.title,
-            rate: tax.rate,
-          },
-        });
-      }
+      // Recalculate totals
+      const totalSubTotal = listContent.reduce((acc: any, item: any) => acc + item.subTotal, 0);
+      const totalTaxes = listContent.reduce((acc: any, item: any) => acc + item.totalTax, 0);
+      const totalAmount = listContent.reduce((acc: any, item: any) => acc + item.total, 0);
 
-      console.log("taxes updated succesfully");
+      await prisma.invoice.update({
+        where: { id: invoice.id },
+        data: {
+          subTotal: totalSubTotal,
+          totalTaxes: totalTaxes,
+          total: totalAmount,
+        },
+      });
 
-      res.status(200).json({msg: "succesfully updated."})
+      console.log("Invoice, list items, and taxes updated successfully.");
+      res.status(200).json({ msg: "Successfully updated." });
     });
   } catch (e) {
     console.log(e);
-    res.status(500).json({msg: "some error occured while updating"})
+    res.status(500).json({ msg: "An error occurred while updating." });
   }
 });
+
 
 // delete specific records via query params
 router.delete(`/delete-invoice/:invoiceId`, async (req, res) => {
