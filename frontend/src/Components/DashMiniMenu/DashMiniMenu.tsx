@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import baseUrl, { frontendUrl } from "../../config";
 import copyToClipboard from "../../utils/copyToClipboard";
 import styles from "./DashMiniMenu.module.css";
+import Loader from "../Loader/Loader";
 
 function DashMiniMenu({ invoiceId }: any) {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   function handleRedirectView() {
@@ -18,20 +20,23 @@ function DashMiniMenu({ invoiceId }: any) {
   }
 
   async function handleDelete() {
+    setLoading(true);
     try {
       const response = await axios.delete(
         `${baseUrl}/invoice/delete-invoice/${invoiceId}`
       );
       if (response.status === 200) {
         navigate("/");
-        location.reload()
+        location.reload();
+        setLoading(false);
       }
     } catch (e: any) {
+      setLoading(false);
       const response = e.response;
       if (response?.status === 404) {
         alert("Already deleted or doesn't exist");
       } else {
-        alert('Server error');
+        alert("Server error");
       }
     }
   }
@@ -47,25 +52,30 @@ function DashMiniMenu({ invoiceId }: any) {
 
   return (
     <>
-      <div className={`${styles.container}`}>
-        <ul className={`${styles.ul}`}>
-          <a className={`${styles.a}`} onClick={handleRedirectEdit}>
-            <li className={`${styles.li}`}>Edit</li>
-          </a>
-          <a className={`${styles.a}`} onClick={handleRedirectView}>
-            <li className={`${styles.li}`}>View</li>
-          </a>
-          <a className={`${styles.a}`} onClick={handleShare}>
-            <li className={`${styles.li}`}>Share</li>
-          </a>
-          <a className={`${styles.a}`} onClick={handleDelete}>
-            <li className={`${styles.li}`}>Delete</li>
-          </a>
-        </ul>
-      </div>
-      {toastMessage && (
-        <div className={styles.toast}>
-          {toastMessage}
+      {!loading ? (
+        <>
+          <div className={`${styles.container}`}>
+            <ul className={`${styles.ul}`}>
+              <a className={`${styles.a}`} onClick={handleRedirectEdit}>
+                <li className={`${styles.li}`}>Edit</li>
+              </a>
+              <a className={`${styles.a}`} onClick={handleRedirectView}>
+                <li className={`${styles.li}`}>View</li>
+              </a>
+              <a className={`${styles.a}`} onClick={handleShare}>
+                <li className={`${styles.li}`}>Share</li>
+              </a>
+              <a className={`${styles.a}`} onClick={handleDelete}>
+                <li className={`${styles.li}`}>Delete</li>
+              </a>
+            </ul>
+          </div>
+          {toastMessage && <div className={styles.toast}>{toastMessage}</div>}
+        </>
+      ) : (
+        <div className={styles.absolute}>
+
+        <Loader />
         </div>
       )}
     </>

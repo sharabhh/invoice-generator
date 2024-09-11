@@ -61,14 +61,7 @@ function Dashboard() {
           <div className={`${styles["dashboard-heading"]}`}>
             <h3>Invoices</h3>
             <div>
-              <input
-                className={`${styles["search-box"]}`}
-                type="text"
-                placeholder="search"
-              />
-              <span className={`${styles["empty-span"]}`}>
-                <IoFilterOutline />
-              </span>
+              {/* "empty div for alignment" */}
             </div>
           </div>
 

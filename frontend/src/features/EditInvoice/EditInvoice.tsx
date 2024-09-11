@@ -100,6 +100,7 @@ function EditInvoice() {
 
   async function handleSubmit() {
     try {
+      setLoading(true)
       // Prepare the payload with calculated values
       const listContent = itemList.map((item) => {
         const { subTotal, total, totalTax } = calculateTotal(item);
@@ -131,9 +132,11 @@ function EditInvoice() {
       });
   
       if (response?.status === 200) {
+        setLoading(false)
         navigate("/");
       }
     } catch (e: any) {
+      setLoading(false)
       console.log(e.response);
     }
   }

@@ -36,7 +36,12 @@ li{
     border: none;
     border-radius: 25px;
 }
-
+.absolute{
+    position: absolute;
+    bottom: 12rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
 @keyframes fader {
     0%{
         opacity: 0
