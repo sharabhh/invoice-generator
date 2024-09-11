@@ -24,6 +24,7 @@ function DashMiniMenu({ invoiceId }: any) {
       );
       if (response.status === 200) {
         navigate("/");
+        location.reload()
       }
     } catch (e: any) {
       const response = e.response;
